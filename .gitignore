@@ -2,6 +2,8 @@
 .DS_store
 .idea/
 
-
 # Ignore files related to API keys
 .venv
+
+# Ignore settings files (so everyone can have their own)
+config/settings.ini
