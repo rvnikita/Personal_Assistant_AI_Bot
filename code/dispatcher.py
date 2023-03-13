@@ -9,7 +9,7 @@ from telegram.ext import Application, MessageHandler, filters, CommandHandler
 import openai
 from bs4 import BeautifulSoup
 
-config = configparser.ConfigParser()
+config = configparser.SafeConfigParser(os.environ)
 config_path = os.path.dirname(__file__) + '/../config/' #we need this trick to get path to config folder
 config.read(config_path + 'settings.ini')
 
@@ -40,6 +40,66 @@ def helper_get_url_content(text):
     except ValueError:
         # If there is an error parsing the URL, return None
         return None, None
+
+def helper_answer_question_for_summary_from_url(question, url):
+    url_content_title, url_content_body = helper_get_url_content(url)
+
+    # check if url is valid
+    if url_content_body is not None:
+        # get openai summary from url_content
+        openai.api_key = config['OPENAI']['KEY']
+
+        # split content into chunks of 2000 chars and loop through them
+        url_content_chunks = [url_content_body[i:i + 2000] for i in range(0, len(url_content_body), 2000)]
+
+        answers_chunks = []
+
+        for i, url_content_chunk in enumerate(url_content_chunks):
+            chunk_messages = [
+                {"role": "system",
+                 "content": f"Answer users question for this website chunk."},
+                {"role": "user",
+                 "content": f"Page title: {url_content_title}"},
+                {"role": "user",
+                 "content": f"Page content chunk {i}:  {url_content_chunk}"}
+            ]
+
+            response = openai.ChatCompletion.create(
+                model=config['OPENAI']['COMPLETION_MODEL'],
+                messages=chunk_messages,
+                temperature=float(config['OPENAI']['TEMPERATURE']),
+                max_tokens=int(config['OPENAI']['MAX_TOKENS']),
+                top_p=1,
+                frequency_penalty=0,
+                presence_penalty=0,
+            )
+            if response['choices'][0]['message']['content'] is not None:
+                answers_chunks.append(response['choices'][0]['message']['content'])
+        messages = [
+            {"role": "system",
+             "content": f"Answer users question based on answers chunks from previous OpenAI calls."},
+            {"role": "user",
+             "content": f"Page title: {url_content_title}"}
+        ]
+        # now let's run through the summary chunks and get a summary of the summaries
+        for j, summary_chunk in enumerate(answers_chunks):
+            messages.append({"role": "user",
+                             "content": f"Answer chunk {j}:  {answers_chunks}"})
+
+        response = openai.ChatCompletion.create(
+            model=config['OPENAI']['COMPLETION_MODEL'],
+            messages=messages,
+            temperature=float(config['OPENAI']['TEMPERATURE']),
+            max_tokens=int(config['OPENAI']['MAX_TOKENS']),
+            top_p=1,
+            frequency_penalty=0,
+            presence_penalty=0,
+        )
+        answer_of_answers = response['choices'][0]['message']['content']
+
+        return answer_of_answers
+    else:
+        None
 
 def helper_get_summary_from_url(url):
     url_content_title, url_content_body = helper_get_url_content(url)
@@ -77,7 +137,7 @@ def helper_get_summary_from_url(url):
 
         messages = [
             {"role": "system",
-             "content": f"Give me a takeaway summary for website base on summary chunks from previous OpenAI calls."},
+             "content": f"Give me a takeaway summary for website based on summary chunks from previous OpenAI calls."},
             {"role": "user",
              "content": f"Page title: {url_content_title}"}
         ]
