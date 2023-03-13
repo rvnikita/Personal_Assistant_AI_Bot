@@ -1,5 +1,7 @@
 requests
+urllib3
 python-telegram-bot
 psycopg2
 configparser
 openai
+bs4
