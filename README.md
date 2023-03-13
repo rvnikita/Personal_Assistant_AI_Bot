@@ -4,8 +4,11 @@ GPTBot is a Telegram bot that uses GPT (Generative Pre-trained Transformer) tech
 
 In addition to its summarization capabilities, GPTBot will also offers personalized assistance, allowing users to teach the bot to use relevant information and customize its responses based on their preferences. This feature enables the bot to become a valuable personal assistant and information manager for users.
 
-You can test bot at http://t.me/Personal_Assistant_AI_Bot
+DEMO: http://t.me/Personal_Assistant_AI_Bot
 
 # Installation
+1. Use environment variables to properly fill settings.ini parameters
 
-Rename settings_template.ini into settings.ini and fill with your credentials from OpenAI and your Telegram Username ID for logs
+# Using bot
+1. Add bot as an admin to your group
+2. Write "/summary https://github.com/rvnikita/Personal_Assistant_AI_Bot"
