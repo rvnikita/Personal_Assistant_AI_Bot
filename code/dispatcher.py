@@ -175,6 +175,7 @@ async def tg_private_dispatcher(update, context):
                 await bot.send_message(update.message.chat.id, "This is not a valid URL.")
     except Exception as e:
         admin_log(f"Error in {__file__}: {e}")
+        await bot.send_message(update.message.chat.id, f"Something went wrong. Error: {e}")
 
 async def tg_summary_dispatcher(update, context):
     try:
@@ -191,6 +192,7 @@ async def tg_summary_dispatcher(update, context):
                 await bot.send_message(update.message.chat.id, "This is not a valid URL.")
     except Exception as e:
         admin_log(f"Error in {__file__}: {e}")
+        await bot.send_message(update.message.chat.id, f"Something went wrong. Error: {e}")
 
 
 def main() -> None:
