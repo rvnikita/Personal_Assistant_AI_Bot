@@ -48,18 +48,43 @@ def helper_get_summary_from_url(url):
         # get openai summary from url_content
         openai.api_key = config['OPENAI']['KEY']
 
-        messages = [
-            {"role": "system",
-             "content": f"Give me a takeaway summary for this website"},
-            {"role": "user",
-             "content": f"Page title: {url_content_title}"}
-        ]
-
         # split content into chunks of 2000 chars and loop through them
         url_content_chunks = [url_content_body[i:i + 2000] for i in range(0, len(url_content_body), 2000)]
 
+        summary_chunks = []
+
         for i, url_content_chunk in enumerate(url_content_chunks):
-            messages.append({"role": "user", "content": f"Page content chunk {i}: {url_content_chunk}"})
+            chunk_messages = [
+                {"role": "system",
+                 "content": f"Give me a takeaway summary for this website chunk"},
+                {"role": "user",
+                 "content": f"Page title: {url_content_title}"},
+                {"role": "user",
+                 "content": f"Page content chunk {i}:  {url_content_chunk}"}
+            ]
+
+            response = openai.ChatCompletion.create(
+                model=config['OPENAI']['COMPLETION_MODEL'],
+                messages=chunk_messages,
+                temperature=float(config['OPENAI']['TEMPERATURE']),
+                max_tokens=int(config['OPENAI']['MAX_TOKENS']),
+                top_p=1,
+                frequency_penalty=0,
+                presence_penalty=0,
+            )
+            if response['choices'][0]['message']['content'] is not None:
+                summary_chunks.append(response['choices'][0]['message']['content'])
+
+        messages = [
+            {"role": "system",
+             "content": f"Give me a takeaway summary for website base on summary chunks from previous OpenAI calls."},
+            {"role": "user",
+             "content": f"Page title: {url_content_title}"}
+        ]
+        #now let's run through the summary chunks and get a summary of the summaries
+        for j, summary_chunk in enumerate(summary_chunks):
+            messages.append({"role": "user",
+                             "content": f"Page summary chunk {j}:  {summary_chunk}"})
 
         response = openai.ChatCompletion.create(
             model=config['OPENAI']['COMPLETION_MODEL'],
@@ -70,8 +95,9 @@ def helper_get_summary_from_url(url):
             frequency_penalty=0,
             presence_penalty=0,
         )
+        summary_of_summaries = response['choices'][0]['message']['content']
 
-        return response['choices'][0]['message']['content']
+        return summary_of_summaries
     else:
         return None
 
@@ -110,6 +136,8 @@ def main() -> None:
 
         #handler for supergroup and group
         application.add_handler(CommandHandler('summary', tg_summary_dispatcher), group=1)
+
+        #TODO: add handler for replys to messages, so we can get questions from users on our summary and answer them
 
         # Start the Bot
         application.run_polling()
