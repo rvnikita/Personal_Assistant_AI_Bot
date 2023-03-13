@@ -162,29 +162,35 @@ def helper_get_summary_from_url(url):
         return None
 
 async def tg_private_dispatcher(update, context):
-    if update.message is not None:
-        url = update.message.text
+    try:
+        if update.message is not None:
+            url = update.message.text
 
-        await bot.send_message(update.message.chat.id, "Generating summary...")
-        summary_from_url = helper_get_summary_from_url(url)
+            await bot.send_message(update.message.chat.id, "Generating summary (can take 2-3 minutes for big pages)...")
+            summary_from_url = helper_get_summary_from_url(url)
 
-        if summary_from_url is not None:
-            await bot.send_message(update.message.chat.id, summary_from_url)
-        else:
-            await bot.send_message(update.message.chat.id, "This is not a valid URL.")
+            if summary_from_url is not None:
+                await bot.send_message(update.message.chat.id, summary_from_url)
+            else:
+                await bot.send_message(update.message.chat.id, "This is not a valid URL.")
+    except Exception as e:
+        admin_log(f"Error in {__file__}: {e}")
 
 async def tg_summary_dispatcher(update, context):
-    if update.message is not None:
-        #cut command from the message and get string starting from non space char
-        url = update.message.text[update.message.text.find(' ')+1:]
+    try:
+        if update.message is not None:
+            #cut command from the message and get string starting from non space char
+            url = update.message.text[update.message.text.find(' ')+1:]
 
-        await bot.send_message(update.message.chat.id, "Generating summary...")
-        summary_from_url = helper_get_summary_from_url(url)
+            await bot.send_message(update.message.chat.id, "Generating summary...")
+            summary_from_url = helper_get_summary_from_url(url)
 
-        if summary_from_url is not None:
-            await bot.send_message(update.message.chat.id, summary_from_url)
-        else:
-            await bot.send_message(update.message.chat.id, "This is not a valid URL.")
+            if summary_from_url is not None:
+                await bot.send_message(update.message.chat.id, summary_from_url)
+            else:
+                await bot.send_message(update.message.chat.id, "This is not a valid URL.")
+    except Exception as e:
+        admin_log(f"Error in {__file__}: {e}")
 
 
 def main() -> None:
