@@ -1,0 +1,7 @@
+# Ignore Mac system files
+.DS_store
+.idea/
+
+
+# Ignore files related to API keys
+.venv
