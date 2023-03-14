@@ -173,10 +173,11 @@ def helper_get_summary_from_text(content_body, content_title = None, ):
 async def tg_summary_dispatcher(update, context):
     try:
         if update.message is not None:
-            #check if it is a reply to a message
+            #check if it is a reply to a message or a forwarded message
             if update.message.reply_to_message is not None:
                 #TODO: maybe here we should check if an url exists even inside the reply_to_message.text together with text
                 url_or_text = update.message.reply_to_message.text
+            #TODO: check if we can also see forwarded messages here
             else:
                 # cut command from the message and get string starting from non space char
                 url_or_text = update.message.text[update.message.text.find(' ') + 1:]
