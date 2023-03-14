@@ -173,12 +173,15 @@ def helper_get_summary_from_text(content_body, content_title = None, ):
 async def tg_summary_dispatcher(update, context):
     try:
         if update.message is not None:
-            # TODO maybe we should check if it's a forwarded message or a reply, so we can use it as an input
+            #check if it is a reply to a message
+            if update.message.reply_to_message is not None:
+                #TODO: maybe here we should check if an url exists even inside the reply_to_message.text together with text
+                url_or_text = update.message.reply_to_message.text
+            else:
+                # cut command from the message and get string starting from non space char
+                url_or_text = update.message.text[update.message.text.find(' ') + 1:]
 
-            #cut command from the message and get string starting from non space char
-            url_or_text = update.message.text[update.message.text.find(' ')+1:]
-
-            await bot.send_message(update.message.chat.id, "Generating summary  (can take 2-3 minutes for big pages)...")
+            await bot.send_message(update.message.chat.id, "Generating summary... \n(can take 2-3 minutes for big pages)")
 
             url_content_title, url_content_body = helper_get_url_content(url_or_text)
 
