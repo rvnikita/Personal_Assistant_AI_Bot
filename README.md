@@ -11,4 +11,4 @@ DEMO: http://t.me/Personal_Assistant_AI_Bot
 
 # Using bot
 1. Add bot as an admin to your group
-2. Write "/summary https://github.com/rvnikita/Personal_Assistant_AI_Bot"
+2. Write "/summary https://github.com/rvnikita/Personal_Assistant_AI_Bot" or "/summary BLOCK OF TEXT"
