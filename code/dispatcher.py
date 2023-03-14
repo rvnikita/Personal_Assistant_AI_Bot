@@ -236,6 +236,8 @@ def main() -> None:
         # I think we need to split everything with commands (at least in chats) without default behaviour
         # In DM maybe we can have a conversational behaviour
 
+        #TODO: we should add logging to admin for debugging purposes of all requests and add "mode" PROD and DEV to config
+
         # Start the Bot
         application.run_polling()
     except Exception as error:
