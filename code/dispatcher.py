@@ -7,6 +7,7 @@ import configparser
 from telegram import Bot
 from telegram.ext import Application, MessageHandler, filters, CommandHandler
 import openai
+import re
 from bs4 import BeautifulSoup
 
 config = configparser.SafeConfigParser(os.environ)
@@ -180,10 +181,20 @@ async def tg_summary_dispatcher(update, context):
             #TODO: check if we can also see forwarded messages here
             else:
                 # cut command from the message and get string starting from non space char
-                url_or_text = update.message.text[update.message.text.find(' ') + 1:]
+                match = re.match(r"^\/summary\s*(.*)$", update.message.text)
+                if match:
+                    url_or_text = match.group(1)
+
+                # check if it's a url_or_text is empty (only spaces,tabs or nothing)
+                if re.match(r"^[\s\t]*$", url_or_text):
+                    await bot.send_message(update.message.chat.id, "You need to provide an url or text after /summary, or reply to a message with /summary command to get summary")
+                    return
+
+            if url_or_text is None:
+                await bot.send_message(update.message.chat.id, "You need to reply to a message or forward a message with an url or just send a text tp get summary")
+                return
 
             await bot.send_message(update.message.chat.id, "Generating summary... \n(can take 2-3 minutes for big pages)")
-
             url_content_title, url_content_body = helper_get_url_content(url_or_text)
 
             #check if it's a url or a text
@@ -205,6 +216,8 @@ def main() -> None:
 
         #summary command handler
         application.add_handler(CommandHandler('summary', tg_summary_dispatcher), group=0)
+
+        #TODO (!) rewrite everything to separate command and it's parameters and then coll needed functions
 
         #TODO: add handler for replys to messages, so we can get questions from users on our summary and answer them
 
