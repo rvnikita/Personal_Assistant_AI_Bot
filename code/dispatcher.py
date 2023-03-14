@@ -57,7 +57,7 @@ def helper_answer_question_for_summary_from_url(question, url):
         for i, url_content_chunk in enumerate(url_content_chunks):
             chunk_messages = [
                 {"role": "system",
-                 "content": f"Answer users question for this website chunk."},
+                 "content": f"Answer users question for this chunk."},
                 {"role": "user",
                  "content": f"Page title: {url_content_title}"},
                 {"role": "user",
@@ -105,61 +105,65 @@ def helper_get_summary_from_url(url):
     url_content_title, url_content_body = helper_get_url_content(url)
     # check if url is valid
     if url_content_body is not None:
-        # get openai summary from url_content
-        openai.api_key = config['OPENAI']['KEY']
+        helper_get_summary_from_text(url_content_body)
+    else:
+        return None
 
-        # split content into chunks of 2000 chars and loop through them
-        url_content_chunks = [url_content_body[i:i + 2000] for i in range(0, len(url_content_body), 2000)]
+def helper_get_summary_from_text(content_body, content_title = None, ):
+    # get openai summary from url_content
+    openai.api_key = config['OPENAI']['KEY']
 
-        summary_chunks = []
+    # split content into chunks of 2000 chars and loop through them
+    content_chunks = [content_body[i:i + 2000] for i in range(0, len(content_body), 2000)]
 
-        for i, url_content_chunk in enumerate(url_content_chunks):
-            chunk_messages = [
-                {"role": "system",
-                 "content": f"Give me a takeaway summary for this website chunk"},
-                {"role": "user",
-                 "content": f"Page title: {url_content_title}"},
-                {"role": "user",
-                 "content": f"Page content chunk {i}:  {url_content_chunk}"}
-            ]
+    summary_chunks = []
 
-            response = openai.ChatCompletion.create(
-                model=config['OPENAI']['COMPLETION_MODEL'],
-                messages=chunk_messages,
-                temperature=float(config['OPENAI']['TEMPERATURE']),
-                max_tokens=int(config['OPENAI']['MAX_TOKENS']),
-                top_p=1,
-                frequency_penalty=0,
-                presence_penalty=0,
-            )
-            if response['choices'][0]['message']['content'] is not None:
-                summary_chunks.append(response['choices'][0]['message']['content'])
-
-        messages = [
+    for i, content_chunk in enumerate(content_chunks):
+        chunk_messages = [
             {"role": "system",
-             "content": f"Give me a takeaway summary for website based on summary chunks from previous OpenAI calls."},
+             "content": f"Give me a takeaway summary for this chunk"},
             {"role": "user",
-             "content": f"Page title: {url_content_title}"}
+             "content": f"Page title: {content_title}"},
+            {"role": "user",
+             "content": f"Page content chunk {i}:  {content_chunk}"}
         ]
-        #now let's run through the summary chunks and get a summary of the summaries
-        for j, summary_chunk in enumerate(summary_chunks):
-            messages.append({"role": "user",
-                             "content": f"Page summary chunk {j}:  {summary_chunk}"})
 
         response = openai.ChatCompletion.create(
             model=config['OPENAI']['COMPLETION_MODEL'],
-            messages=messages,
+            messages=chunk_messages,
             temperature=float(config['OPENAI']['TEMPERATURE']),
             max_tokens=int(config['OPENAI']['MAX_TOKENS']),
             top_p=1,
             frequency_penalty=0,
             presence_penalty=0,
         )
-        summary_of_summaries = response['choices'][0]['message']['content']
+        if response['choices'][0]['message']['content'] is not None:
+            summary_chunks.append(response['choices'][0]['message']['content'])
 
-        return summary_of_summaries
-    else:
-        return None
+    messages = [
+        {"role": "system",
+         "content": f"Give me a takeaway summary based on summary chunks from previous OpenAI calls."},
+        {"role": "user",
+         "content": f"Page title: {content_title}"}
+    ]
+    # now let's run through the summary chunks and get a summary of the summaries
+    for j, summary_chunk in enumerate(summary_chunks):
+        messages.append({"role": "user",
+                         "content": f"Page summary chunk {j}:  {summary_chunk}"})
+
+    response = openai.ChatCompletion.create(
+        model=config['OPENAI']['COMPLETION_MODEL'],
+        messages=messages,
+        temperature=float(config['OPENAI']['TEMPERATURE']),
+        max_tokens=int(config['OPENAI']['MAX_TOKENS']),
+        top_p=1,
+        frequency_penalty=0,
+        presence_penalty=0,
+    )
+    summary_of_summaries = response['choices'][0]['message']['content']
+
+    return summary_of_summaries
+
 
 async def tg_private_dispatcher(update, context):
     try:
@@ -172,7 +176,8 @@ async def tg_private_dispatcher(update, context):
             if summary_from_url is not None:
                 await bot.send_message(update.message.chat.id, summary_from_url)
             else:
-                await bot.send_message(update.message.chat.id, "This is not a valid URL.")
+                summary_from_text = helper_get_summary_from_text(update.message.text)
+                await bot.send_message(update.message.chat.id, summary_from_text)
     except Exception as e:
         admin_log(f"Error in {__file__}: {e}")
         await bot.send_message(update.message.chat.id, f"Something went wrong. Error: {e}")
@@ -194,6 +199,23 @@ async def tg_summary_dispatcher(update, context):
         admin_log(f"Error in {__file__}: {e}")
         await bot.send_message(update.message.chat.id, f"Something went wrong. Error: {e}")
 
+async def tg_group_dispatcher(update, context):
+    try:
+        if update.message is not None:
+            #cut bot name from the message and get string starting from non space char
+            content_body = update.message.text[update.message.text.find(' ')+1:]
+
+            await bot.send_message(update.message.chat.id, "Generating summary...")
+            summary_from_text = helper_get_summary_from_text(content_body)
+
+            if summary_from_text is not None:
+                await bot.send_message(update.message.chat.id, summary_from_text)
+            else:
+                await bot.send_message(update.message.chat.id, "Could not generate summary.")
+    except Exception as e:
+        admin_log(f"Error in {__file__}: {e}")
+        await bot.send_message(update.message.chat.id, f"Something went wrong. Error: {e}")
+
 
 def main() -> None:
     try:
@@ -202,10 +224,17 @@ def main() -> None:
         #handler for incoming DM
         application.add_handler(MessageHandler(filters.TEXT & filters.ChatType.PRIVATE & ~filters.COMMAND, tg_private_dispatcher), group=0)
 
-        #handler for supergroup and group
+        #summary command handler
         application.add_handler(CommandHandler('summary', tg_summary_dispatcher), group=1)
 
+        #supergroup handler
+        application.add_handler(MessageHandler(filters.TEXT & filters.ChatType.SUPERGROUP, tg_group_dispatcher), group=2)
+
         #TODO: add handler for replys to messages, so we can get questions from users on our summary and answer them
+
+        #TODO: think about how properly separate private, supergroup, commands etc without duplicating code.  I think we need too split everything with commands (
+        # I think we need to split everything with commands (at least in chats) without default behaviour
+        # In DM maybe we can have a conversational behaviour
 
         # Start the Bot
         application.run_polling()
