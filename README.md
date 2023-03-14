@@ -1,4 +1,4 @@
-# Personal_Assistant_AI_Bot
+# Personal Assistant AI Bot
 
 GPTBot is a Telegram bot that uses GPT (Generative Pre-trained Transformer) technology to summarize text for users. With GPTBot, users can submit a URL or text to receive a concise summary of the content, making it easy to quickly understand the main points without reading through the entire text.
 
