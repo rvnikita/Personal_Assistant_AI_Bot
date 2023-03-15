@@ -212,7 +212,25 @@ async def tg_summary_dispatcher(update, context, command_args):
 
     except Exception as e:
         logger.error(f"Error in {__file__}: {e}")
-        await bot.send_message(update.message.chat.id, f"Something went wrong. Error: {e}")
+
+async def tg_start_dispatcher(update, context, command_args):
+    try:
+        if update.message is not None:
+            logger.info(f"tg_start request {update.message.chat.first_name} {update.message.chat.last_name} @{update.message.chat.username} ({update.message.chat.id}): {update.message.text}")
+
+            #TODO: think how could we compile this message automatically from the list of supported commands
+            welcome_message = (f"Hi {update.message.chat.first_name} {update.message.chat.last_name}!\n" 
+            "I'm an AI Personal Aisstant.\n\n"
+            "*List of supported commands:*\n"
+            "/summary or /s - get summary of a text or a webpage\n"
+            "/prompt or /p - get GPT prompt answe\n"
+            "/start - get welcome message with available commands\n\n"
+            "I'm still in development, so I'm not very smart yet. But I'm learning every day."
+            "You can find my source code here: https://github.com/rvnikita/Personal_Assistant_AI_Bot")
+
+            await bot.send_message(update.message.chat.id, welcome_message, parse_mode="Markdown")
+    except Exception as e:
+        logger.error(f"Error in {__file__}: {e}")
 
 #we will use this function to separate command and it's parameters and send to the proper function
 async def tg_dispatcher(update, context):
@@ -232,6 +250,8 @@ async def tg_dispatcher(update, context):
 
             if command == "summary" or command == "s":
                 await tg_summary_dispatcher(update, context, command_args)
+            elif command == "start":
+                await tg_start_dispatcher(update, context, command_args)
             # Add more command handlers here as elif statements
             else:
                 await bot.send_message(update.message.chat.id, f"Unknown command: {command}")
