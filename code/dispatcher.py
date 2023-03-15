@@ -203,6 +203,7 @@ async def tg_summary_dispatcher(update, context, command_args):
             if url_content_body is not None: #so that was a valid url
                 summary = helper_get_summary_from_text(url_content_body, url_content_title)
             else: #so that was a text
+                #FIXME: we can get url_content_body = None even for valid url. So this else is not 100% correct
                 summary = helper_get_summary_from_text(url_or_text)
 
             await bot.send_message(update.message.chat.id, summary, reply_to_message_id=update.message.message_id)
