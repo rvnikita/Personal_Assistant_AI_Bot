@@ -171,7 +171,8 @@ def helper_get_summary_from_text(content_body, content_title = None, ):
     return summary_of_summaries
 
 
-async def tg_summary_dispatcher(update, context):
+async def tg_summary_dispatcher(update, context, command_args):
+    #TODO we need tests for this funciton
     try:
         if update.message is not None:
             #check if it is a reply to a message or a forwarded message
@@ -180,10 +181,7 @@ async def tg_summary_dispatcher(update, context):
                 url_or_text = update.message.reply_to_message.text
             #TODO: check if we can also see forwarded messages here
             else:
-                # cut command from the message and get string starting from non space char
-                match = re.match(r"^\/summary\s*(.*)$", update.message.text)
-                if match:
-                    url_or_text = match.group(1)
+                url_or_text = command_args
 
                 # check if it's a url_or_text is empty (only spaces,tabs or nothing)
                 if re.match(r"^[\s\t]*$", url_or_text):
@@ -209,13 +207,36 @@ async def tg_summary_dispatcher(update, context):
         admin_log(f"Error in {__file__}: {e}")
         await bot.send_message(update.message.chat.id, f"Something went wrong. Error: {e}")
 
+#we will use this function to separate command and it's parameters and send to the proper function
+async def tg_dispatcher(update, context):
+    try:
+        if update.message is not None:
+            command = None
+            match = re.match(r"^\/(\w+)\s*(.*)$", update.message.text)
+            if match:
+                command = match.group(1)
+                command_args = match.group(2)
+            else:
+                await bot.send_message(update.message.chat.id, f"Unknown command")
+                return
+
+            if command == "summary":
+                await tg_summary_dispatcher(update, context, command_args)
+            # Add more command handlers here as elif statements
+            else:
+                await bot.send_message(update.message.chat.id, f"Unknown command: {command}")
+
+    except Exception as e:
+        admin_log(f"Error in {__file__}: {e}")
+        await bot.send_message(update.message.chat.id, f"Something went wrong. Error: {e}")
+
 
 def main() -> None:
     try:
         application = Application.builder().token(config['BOT']['KEY']).build()
 
         #summary command handler
-        application.add_handler(CommandHandler('summary', tg_summary_dispatcher), group=0)
+        application.add_handler(MessageHandler(filters=filters.ALL, callback=tg_dispatcher), group=0)
 
         #TODO (!) rewrite everything to separate command and it's parameters and then coll needed functions
 
