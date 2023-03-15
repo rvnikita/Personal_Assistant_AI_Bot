@@ -223,7 +223,8 @@ async def tg_dispatcher(update, context):
                 command = match.group(1)
                 command_args = match.group(2)
             else:
-                await bot.send_message(update.message.chat.id, f"Unknown command")
+                #await bot.send_message(update.message.chat.id, f"Unknown command")
+                #doing nothing
                 return
 
             if command == "summary":
