@@ -177,7 +177,7 @@ async def tg_summary_dispatcher(update, context, command_args):
     #TODO we need tests for this funciton
     try:
         if update.message is not None:
-            logger.info(f"tg_dispatcher request {update.message.chat.first_name} {update.message.chat.last_name} @{update.message.chat.username} ({update.message.chat.id}): {update.message.text}")
+            logger.info(f"tg_summary_dispatcher request {update.message.chat.first_name} {update.message.chat.last_name} @{update.message.chat.username} ({update.message.chat.id}): {update.message.text}")
             #check if it is a reply to a message or a forwarded message
             if update.message.reply_to_message is not None:
                 #TODO: maybe here we should check if an url exists even inside the reply_to_message.text together with text
@@ -216,7 +216,7 @@ async def tg_summary_dispatcher(update, context, command_args):
 async def tg_start_dispatcher(update, context, command_args):
     try:
         if update.message is not None:
-            logger.info(f"tg_start request {update.message.chat.first_name} {update.message.chat.last_name} @{update.message.chat.username} ({update.message.chat.id}): {update.message.text}")
+            logger.info(f"tg_start_dispatcher request {update.message.chat.first_name} {update.message.chat.last_name} @{update.message.chat.username} ({update.message.chat.id}): {update.message.text}")
 
             #TODO: think how could we compile this message automatically from the list of supported commands
             welcome_message = (f"Hi {update.message.chat.first_name} {update.message.chat.last_name}!\n" 
