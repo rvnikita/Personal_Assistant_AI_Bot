@@ -195,7 +195,7 @@ async def tg_summary_dispatcher(update, context, command_args):
                 await bot.send_message(update.message.chat.id, "You need to reply to a message or forward a message with an url or just send a text tp get summary")
                 return
 
-            await bot.send_message(update.message.chat.id, "Generating summary... \n(can take 2-3 minutes for big pages)")
+            await bot.send_message(update.message.chat.id, "Generating summary... \n(can take 2-3 minutes for big pages)", reply_to_message_id=update.message.message_id)
             url_content_title, url_content_body = helper_get_url_content(url_or_text)
 
             #check if it's a url or a text
@@ -204,7 +204,7 @@ async def tg_summary_dispatcher(update, context, command_args):
             else: #so that was a text
                 summary = helper_get_summary_from_text(url_or_text)
 
-            await bot.send_message(update.message.chat.id, summary)
+            await bot.send_message(update.message.chat.id, summary, reply_to_message_id=update.message.message_id)
 
     except Exception as e:
         admin_log(f"Error in {__file__}: {e}")
