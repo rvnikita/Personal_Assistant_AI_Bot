@@ -124,7 +124,7 @@ def helper_get_summary_from_text(content_body, content_title = None, ):
     for i, content_chunk in enumerate(content_chunks):
         chunk_messages = [
             {"role": "system",
-             "content": f"Give me a takeaway summary for this text in the same language as the original text."},
+             "content": f"Give me a takeaway summary for this text in the original language."},
             {"role": "user",
              "content": f"Title: {content_title}"},
             {"role": "user",
@@ -148,7 +148,7 @@ def helper_get_summary_from_text(content_body, content_title = None, ):
 
     messages = [
         {"role": "system",
-         "content": f"Give me a takeaway summary based on title and texts in the same language as the original text."},
+         "content": f"Give me a takeaway summary in the original language based on title and texts."},
         {"role": "user",
          "content": f"Title: {content_title}"}
     ]
