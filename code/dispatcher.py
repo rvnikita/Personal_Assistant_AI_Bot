@@ -31,7 +31,7 @@ def helper_get_url_content(text):
                 # If the request is successful, let's clean it with BeautifulSoup
                 soup = BeautifulSoup(response.text, "html.parser")
                 title = soup.title.get_text(separator=" ", strip=True) if soup.title else None
-                body = soup.body.get_text(separator=" ", strip=True)
+                body = soup.body.get_text(separator=" ", strip=True) if soup.body else None
 
                 return title, body
             else:
