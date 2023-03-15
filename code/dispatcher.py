@@ -179,6 +179,9 @@ async def tg_summary_dispatcher(update, context, command_args):
             if update.message.reply_to_message is not None:
                 #TODO: maybe here we should check if an url exists even inside the reply_to_message.text together with text
                 url_or_text = update.message.reply_to_message.text
+            elif update.message.forward_from is not None:
+                #TODO because forward message and text attached to it comming as two different messages I  don't know how to handle it for now
+                url_or_text = update.message.forward_from.text
             #TODO: check if we can also see forwarded messages here
             else:
                 url_or_text = command_args
