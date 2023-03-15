@@ -1,4 +1,4 @@
-from admin_log import admin_log
+import tglogging as logging
 
 import requests
 from urllib.parse import urlparse
@@ -14,8 +14,9 @@ config = configparser.SafeConfigParser(os.environ)
 config_path = os.path.dirname(__file__) + '/../config/' #we need this trick to get path to config folder
 config.read(config_path + 'settings.ini')
 
-#TODO seems like we need to rewrite this with logging module
-admin_log(f"Starting {__file__} in {config['BOT']['MODE']} mode at {os.uname()}")
+logger = logging.get_logger()
+
+logger.info('Starting ' + __file__ + ' in ' + config['BOT']['MODE'] + ' mode at ' + str(os.uname()))
 
 bot = Bot(config['BOT']['KEY'])
 
@@ -176,6 +177,7 @@ async def tg_summary_dispatcher(update, context, command_args):
     #TODO we need tests for this funciton
     try:
         if update.message is not None:
+            logger.info(f"tg_dispatcher request {update.message.chat.first_name} {update.message.chat.last_name} @{update.message.chat.username} ({update.message.chat.id}): {update.message.text}")
             #check if it is a reply to a message or a forwarded message
             if update.message.reply_to_message is not None:
                 #TODO: maybe here we should check if an url exists even inside the reply_to_message.text together with text
@@ -209,14 +211,14 @@ async def tg_summary_dispatcher(update, context, command_args):
             await bot.send_message(update.message.chat.id, summary, reply_to_message_id=update.message.message_id)
 
     except Exception as e:
-        admin_log(f"Error in {__file__}: {e}")
+        logger.error(f"Error in {__file__}: {e}")
         await bot.send_message(update.message.chat.id, f"Something went wrong. Error: {e}")
 
 #we will use this function to separate command and it's parameters and send to the proper function
 async def tg_dispatcher(update, context):
     try:
         if update.message is not None:
-            admin_log(f"Message from {update.message.chat.first_name} {update.message.chat.last_name} @{update.message.chat.username} ({update.message.chat.id}): {update.message.text}")
+            logger.info(f"tg_dispatcher request {update.message.chat.first_name} {update.message.chat.last_name} @{update.message.chat.username} ({update.message.chat.id}): {update.message.text}")
 
             command = None
             match = re.match(r"^\/(\w+)\s*([\s\S]*)$", update.message.text, re.DOTALL)
@@ -235,9 +237,7 @@ async def tg_dispatcher(update, context):
                 await bot.send_message(update.message.chat.id, f"Unknown command: {command}")
 
     except Exception as e:
-        admin_log(f"Error in {__file__}: {e}")
-        await bot.send_message(update.message.chat.id, f"Something went wrong. Error: {e}")
-
+        logger.error(f"Error in {__file__}: {e}")
 
 def main() -> None:
     try:
@@ -257,7 +257,7 @@ def main() -> None:
         # Start the Bot
         application.run_polling()
     except Exception as error:
-        admin_log(f"Error in file {__file__}: {error}")
+        logger.info(f"Error in file {__file__}: {error}")
 
 if __name__ == '__main__':
     main()
