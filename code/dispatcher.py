@@ -230,7 +230,7 @@ async def tg_dispatcher(update, context):
                 #doing nothing
                 return
 
-            if command == "summary":
+            if command == "summary" or command == "s":
                 await tg_summary_dispatcher(update, context, command_args)
             # Add more command handlers here as elif statements
             else:
