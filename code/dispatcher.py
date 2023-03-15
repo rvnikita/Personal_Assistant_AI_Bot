@@ -215,7 +215,7 @@ async def tg_summary_dispatcher(update, context, command_args):
 async def tg_dispatcher(update, context):
     try:
         if update.message is not None:
-            admin_log(f"Message from {update.message.chat.id}: {update.message.text}")
+            admin_log(f"Message from {update.message.chat.first_name} {update.message.chat.first_name} @{update.message.chat.username} ({update.message.chat.id}): {update.message.text}")
 
             command = None
             match = re.match(r"^\/(\w+)([\s\S]*)$", update.message.text, re.DOTALL)
