@@ -14,6 +14,7 @@ config = configparser.SafeConfigParser(os.environ)
 config_path = os.path.dirname(__file__) + '/../config/' #we need this trick to get path to config folder
 config.read(config_path + 'settings.ini')
 
+#TODO seems like we need to rewrite this with logging module
 admin_log(f"Starting {__file__} in {config['BOT']['MODE']} mode at {os.uname()}")
 
 bot = Bot(config['BOT']['KEY'])
@@ -214,6 +215,8 @@ async def tg_summary_dispatcher(update, context, command_args):
 async def tg_dispatcher(update, context):
     try:
         if update.message is not None:
+            admin_log(f"Message from {update.message.chat.id}: {update.message.text}")
+
             command = None
             match = re.match(r"^\/(\w+)\s*(.*)$", update.message.text)
             if match:
