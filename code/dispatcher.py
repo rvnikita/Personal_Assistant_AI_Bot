@@ -242,8 +242,8 @@ def main() -> None:
     try:
         application = Application.builder().token(config['BOT']['KEY']).build()
 
-        #summary command handler
-        application.add_handler(MessageHandler(filters=filters.ALL, callback=tg_dispatcher), group=0)
+        #for now only work with commands
+        application.add_handler(MessageHandler(filters=filters.ALL & filters.COMMAND, callback=tg_dispatcher), group=0)
 
         #TODO (!) rewrite everything to separate command and it's parameters and then coll needed functions
 
