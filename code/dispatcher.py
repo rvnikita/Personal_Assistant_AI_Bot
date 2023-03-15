@@ -218,7 +218,7 @@ async def tg_dispatcher(update, context):
             admin_log(f"Message from {update.message.chat.id}: {update.message.text}")
 
             command = None
-            match = re.match(r"^\/(\w+)\s*(.*)", update.message.text)
+            match = re.match(r"^\/(\w+)([\s\S]*)$", update.message.text, re.DOTALL)
             if match:
                 command = match.group(1)
                 command_args = match.group(2)
