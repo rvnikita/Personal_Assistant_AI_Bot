@@ -118,7 +118,7 @@ def helper_get_answer_from_prompt(prompt):
 
         messages = [
             {"role": "system",
-             "content": f"Act as a chatbot assistant and answer users question."}, #TODO:Low: may be we need to rewrite this prompt
+             "content": f"Act as a chatbot assistant and answer users question."}, #TODO:LOW: may be we need to rewrite this prompt
             {"role": "user",
              "content": f"{prompt}"}
         ]
@@ -277,14 +277,14 @@ async def tg_start_dispatcher(update, context, command_args):
             logger.info(f"tg_start_dispatcher request {update.message.chat.first_name} {update.message.chat.last_name} @{update.message.chat.username} ({update.message.chat.id}): {update.message.text}")
             welcome_message = (f"Hi {update.message.chat.first_name} {update.message.chat.last_name}!\n"
             "I'm an AI Personal Aisstant.\n\n"
-            "*List of supported commands:*\n"
+            "<b>List of supported commands:</b>\n"
             "/summary or /s - get summary of a text or a webpage\n"
             "/prompt or /p - get GPT prompt answe\n"
             "/start - get welcome message with available commands\n\n"
             "I'm still in development, so I'm not very smart yet. But I'm learning every day."
-            "You can find my source code here: https://github.com/rvnikita/Personal_Assistant_AI_Bot")
+            "You can find my source code here: <a href=\"https://github.com/rvnikita/Personal_Assistant_AI_Bot\">https://github.com/rvnikita/Personal_Assistant_AI_Bot</a>")
 
-            await bot.send_message(update.message.chat.id, welcome_message, parse_mode="Markdown")
+            await bot.send_message(update.message.chat.id, welcome_message, parse_mode="HTML", disable_web_page_preview=True)
     except Exception as e:
         logger.error(f"Error in {__file__}: {e}")
 
