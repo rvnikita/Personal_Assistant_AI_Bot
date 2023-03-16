@@ -112,7 +112,37 @@ def helper_get_summary_from_url(url):
     else:
         return None
 
+def helper_get_answer_from_prompt(prompt):
+    try:
+        openai.api_key = config['OPENAI']['KEY']
+
+        messages = [
+            {"role": "system",
+             "content": f"Act as a chatbot assistant and answer users question."}, #TODO:Low: may be we need to rewrite this prompt
+            {"role": "user",
+             "content": f"{prompt}"}
+        ]
+
+        response = openai.ChatCompletion.create(
+            model=config['OPENAI']['COMPLETION_MODEL'],
+            messages=messages,
+            temperature=float(config['OPENAI']['TEMPERATURE']),
+            max_tokens=int(config['OPENAI']['MAX_TOKENS']),
+            top_p=1,
+            frequency_penalty=0,
+            presence_penalty=0,
+        )
+        if response['choices'][0]['message']['content'] is not None:
+            return response['choices'][0]['message']['content']
+        else:
+            return None
+    except Exception as e:
+        logger.error(e)
+        return None
+
+
 def helper_get_summary_from_text(content_body, content_title = None, ):
+    #TODO:High: seems like we need to move this helpers to a separate openai file
     # get openai summary from url_content
     openai.api_key = config['OPENAI']['KEY']
 
@@ -172,6 +202,33 @@ def helper_get_summary_from_text(content_body, content_title = None, ):
 
     return summary_of_summaries
 
+async def tg_prompt_dispatcher(update, context, command_args):
+    try:
+        #TODO:MEDIUM: support previous conversation history
+        if update.message is not None:
+            logger.info(f"tg_prompt_dispatcher request {update.message.chat.first_name} {update.message.chat.last_name} @{update.message.chat.username} ({update.message.chat.id}): {update.message.text}")
+
+        if re.match(r"^[\s\t]*$", command_args):
+            #TODO:High: Seems like we need to write a fucntion that will wrap answers to the user so we can log inside it for cleaner code
+            logger.info("You need to provide a prompt after /prompt command")
+            await bot.send_message(update.message.chat.id,
+                                   "You need to provide a prompt after /prompt command")
+            return
+
+        await bot.send_message(update.message.chat.id, "Generating answer...",  reply_to_message_id=update.message.message_id)
+
+        answer = helper_get_answer_from_prompt(command_args)
+        if answer is not None:
+            await bot.send_message(update.message.chat.id, answer, reply_to_message_id=update.message.message_id)
+        else:
+            await bot.send_message(update.message.chat.id, "Sorry, I can't answer that.", reply_to_message_id=update.message.message_id)
+
+        return
+
+
+
+    except Exception as e:
+        logger.error(f"tg_prompt_dispatcher error {e}")
 
 async def tg_summary_dispatcher(update, context, command_args):
     #TODO we need tests for this funciton
@@ -252,6 +309,8 @@ async def tg_dispatcher(update, context):
                 await tg_summary_dispatcher(update, context, command_args)
             elif command == "start":
                 await tg_start_dispatcher(update, context, command_args)
+            elif command == "prompt" or command == "p":
+                await tg_prompt_dispatcher(update, context, command_args)
             # Add more command handlers here as elif statements
             else:
                 await bot.send_message(update.message.chat.id, f"Unknown command: {command}")
