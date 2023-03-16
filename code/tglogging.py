@@ -13,13 +13,13 @@ class TelegramLoggerHandler(logging.Handler):
 
     def emit(self, record):
         # OVERWRITE LOG METHOD WITH OUR TELEGRAM LOGIC
-        # TODO: maybe it's better to rewrite this with bot.send_message
+        # TODO:LOW: maybe it's better to rewrite this with bot.send_message
         URL = f"https://api.telegram.org/bot{config['BOT']['KEY']}/sendMessage?chat_id={config['BOT']['ADMIN_ID']}&text={record}"
 
         r = requests.get(url=URL)
         data = r.json()
 
-        # TODO: check if we need to call original emit method
+        # TODO:LOW: check if we need to call original emit method
         # super().emit(record)
 
 def get_logger():

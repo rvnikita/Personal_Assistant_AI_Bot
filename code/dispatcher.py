@@ -231,7 +231,7 @@ async def tg_prompt_dispatcher(update, context, command_args):
         logger.error(f"tg_prompt_dispatcher error {e}")
 
 async def tg_summary_dispatcher(update, context, command_args):
-    #TODO we need tests for this funciton
+    #TODO:HIGH: we need tests for this funciton
     try:
         if update.message is not None:
             logger.info(f"tg_summary_dispatcher request {update.message.chat.first_name} {update.message.chat.last_name} @{update.message.chat.username} ({update.message.chat.id}): {update.message.text}")
@@ -325,13 +325,8 @@ def main() -> None:
         #for now only work with commands
         application.add_handler(MessageHandler(filters=filters.ALL & filters.COMMAND, callback=tg_dispatcher), group=0)
 
-        #TODO (!) rewrite everything to separate command and it's parameters and then coll needed functions
-
-        #TODO: add handler for replys to messages, so we can get questions from users on our summary and answer them
-
-        #TODO: We can add default behaviour to show available commands if user sends a message that is not a command
-
-        #TODO: we should add logging to admin for debugging purposes of all requests and add "mode" PROD and DEV to config
+        #TODO:LOW: add handler for replys to messages, so we can get questions from users on our summary and answer them
+        #TODO:LOW: We can add default behaviour to show available commands if user sends a message that is not a command, but we should not send it in chats, otherwise we will be triggered everytime
 
         # Start the Bot
         application.run_polling()
