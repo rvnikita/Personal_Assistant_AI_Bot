@@ -142,7 +142,7 @@ def helper_get_answer_from_prompt(prompt):
 
 
 def helper_get_summary_from_text(content_body, content_title = None, ):
-    #TODO:High: seems like we need to move this helpers to a separate openai file
+    #TODO:HIGH: seems like we need to move this helpers to a separate openai file
     # get openai summary from url_content
     openai.api_key = config['OPENAI']['KEY']
 
@@ -173,7 +173,7 @@ def helper_get_summary_from_text(content_body, content_title = None, ):
         if response['choices'][0]['message']['content'] is not None:
             summary_chunks.append(response['choices'][0]['message']['content'])
 
-        #TODO: it's a good idea to edit previous message adding a dot at each iteration for Generating summary...
+        #TODO:LOW: it's a good idea to edit previous message adding a dot at each iteration for Generating summary...
         print(f"Generating summary... {i}")
 
     messages = [
@@ -204,12 +204,12 @@ def helper_get_summary_from_text(content_body, content_title = None, ):
 
 async def tg_prompt_dispatcher(update, context, command_args):
     try:
-        #TODO:MEDIUM: support previous conversation history
+        #TODO:MED: support previous conversation history
         if update.message is not None:
             logger.info(f"tg_prompt_dispatcher request {update.message.chat.first_name} {update.message.chat.last_name} @{update.message.chat.username} ({update.message.chat.id}): {update.message.text}")
 
         if re.match(r"^[\s\t]*$", command_args):
-            #TODO:High: Seems like we need to write a fucntion that will wrap answers to the user so we can log inside it for cleaner code
+            #TODO:HIGH: Seems like we need to write a fucntion that will wrap answers to the user so we can log inside it for cleaner code
             logger.info("You need to provide a prompt after /prompt command")
             await bot.send_message(update.message.chat.id,
                                    "You need to provide a prompt after /prompt command")
@@ -273,10 +273,9 @@ async def tg_summary_dispatcher(update, context, command_args):
 async def tg_start_dispatcher(update, context, command_args):
     try:
         if update.message is not None:
+            # TODO: think how could we compile this message automatically from the list of supported commands
             logger.info(f"tg_start_dispatcher request {update.message.chat.first_name} {update.message.chat.last_name} @{update.message.chat.username} ({update.message.chat.id}): {update.message.text}")
-
-            #TODO: think how could we compile this message automatically from the list of supported commands
-            welcome_message = (f"Hi {update.message.chat.first_name} {update.message.chat.last_name}!\n" 
+            welcome_message = (f"Hi {update.message.chat.first_name} {update.message.chat.last_name}!\n"
             "I'm an AI Personal Aisstant.\n\n"
             "*List of supported commands:*\n"
             "/summary or /s - get summary of a text or a webpage\n"
