@@ -5,15 +5,15 @@ from unittest.mock import MagicMock
 from unittest.mock import AsyncMock
 from unittest.mock import patch
 
-# Import the function from your code
-from src.dispatcher import tg_start_dispatcher
+# MOCKING
+pytestmark = pytest.mark.asyncio
 
 # Mock the bot object to avoid sending actual messages during the test
 class MockBot:
     async def send_message(self, chat_id, text, parse_mode, disable_web_page_preview):
         pass
-
 bot = MockBot()
+patch('src.dispatcher.bot', bot)
 
 # Mock the logger object to avoid logging during the test
 class MockLogger:
@@ -22,11 +22,13 @@ class MockLogger:
 
     def error(self, message):
         pass
+def mock_get_logger():
+    return MockLogger()
 
-@pytest.mark.asyncio
-@patch('src.dispatcher.bot', bot)
-@patch('src.dispatcher.logger', MockLogger())
-# @patch('src.dispatcher.Bot.send_message', new_callable=AsyncMock)
+with patch('src.tglogging.get_logger', mock_get_logger):
+    # from src.dispatcher import tg_start_dispatcher
+    import src.dispatcher
+
 async def test_tg_start_dispatcher():
     # Create mock update and context objects
     update = MagicMock()
@@ -44,7 +46,7 @@ async def test_tg_start_dispatcher():
     # logger = MockLogger()
 
     # Call the tg_start_dispatcher function with the mock update and context objects
-    await tg_start_dispatcher(update, context, [])
+    await src.dispatcher.tg_start_dispatcher(update, context, [])
 
     # Check if the result contains the expected welcome message
     expected_welcome_message = (
