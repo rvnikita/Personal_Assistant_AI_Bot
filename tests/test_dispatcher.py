@@ -25,6 +25,7 @@ class MockLogger:
 
 @pytest.mark.asyncio
 @patch('src.dispatcher.bot', bot)
+@patch('src.dispatcher.logger', MockLogger())
 # @patch('src.dispatcher.Bot.send_message', new_callable=AsyncMock)
 async def test_tg_start_dispatcher():
     # Create mock update and context objects
