@@ -4,3 +4,6 @@
 
 # Ignore files related to API keys
 .venv
+
+# Ignore all pytest_cache directories
+**/.pytest_cache
