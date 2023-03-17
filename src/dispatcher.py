@@ -1,4 +1,4 @@
-import tglogging as logging
+import src.tglogging as logging
 
 import requests
 from urllib.parse import urlparse
