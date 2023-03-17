@@ -1,32 +1,37 @@
 import pytest
-import code
-import asyncio
 from unittest.mock import MagicMock
-from unittest.mock import AsyncMock
 from unittest.mock import patch
 
-# Import the function from your code
 from src.dispatcher import tg_start_dispatcher
 
-# Mock the bot object to avoid sending actual messages during the test
+pytestmark = pytest.mark.asyncio #this is needed to run async functions
+
+# Mocking bot object
 class MockBot:
     async def send_message(self, chat_id, text, parse_mode, disable_web_page_preview):
         pass
-
 bot = MockBot()
+patch('src.dispatcher.bot', bot)
 
-# Mock the logger object to avoid logging during the test
+# Mocking logger object
 class MockLogger:
     def info(self, message):
         pass
-
     def error(self, message):
         pass
+#we need this to mock get_logger to mock the logger object
+def mock_get_logger():
+    mock_logger = MockLogger()
+    return mock_logger
+patch('src.tglogging.get_logger', mock_get_logger)
 
-@pytest.mark.asyncio
-@patch('src.dispatcher.bot', bot)
-@patch('src.dispatcher.logger', MockLogger())
-# @patch('src.dispatcher.Bot.send_message', new_callable=AsyncMock)
+
+
+
+
+# @pytest.mark.asyncio
+# @patch('src.dispatcher.bot', bot)
+# @patch('src.tglogging.get_logger', mock_get_logger)
 async def test_tg_start_dispatcher():
     # Create mock update and context objects
     update = MagicMock()
