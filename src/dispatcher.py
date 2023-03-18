@@ -292,6 +292,7 @@ async def tg_start_dispatcher(update, context, command_args):
 async def tg_dispatcher(update, context):
     try:
         if update.message is not None:
+            #TODO:MED: this is not working if it is a chat, not a DM
             logger.info(f"tg_dispatcher request {update.message.chat.first_name} {update.message.chat.last_name} @{update.message.chat.username} ({update.message.chat.id}): {update.message.text}")
 
             command = None
