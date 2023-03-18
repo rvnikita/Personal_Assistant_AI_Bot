@@ -60,9 +60,4 @@ async def test_tg_start_dispatcher():
         "You can find my source code here: <a href=\"https://github.com/rvnikita/Personal_Assistant_AI_Bot\">https://github.com/rvnikita/Personal_Assistant_AI_Bot</a>"
     )
 
-    # assert mock_send_message.called_once_with(
-    #     12345,
-    #     expected_welcome_message,
-    #     parse_mode="HTML",
-    #     disable_web_page_preview=True
-    # )
+#just a random comment to test autolaunch tests
