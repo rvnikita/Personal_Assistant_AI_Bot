@@ -5,29 +5,23 @@ from unittest.mock import MagicMock
 from unittest.mock import AsyncMock
 from unittest.mock import patch
 
-# MOCKING
+# START OF MOCKING
 pytestmark = pytest.mark.asyncio
 
 # Mock the bot object to avoid sending actual messages during the test
-class MockBot:
-    async def send_message(self, chat_id, text, parse_mode, disable_web_page_preview):
-        pass
-bot = MockBot()
+bot = MagicMock()
 patch('src.dispatcher.bot', bot)
 
-# Mock the logger object to avoid logging during the test
-class MockLogger:
-    def info(self, message):
-        pass
-
-    def error(self, message):
-        pass
 def mock_get_logger():
-    return MockLogger()
+    return MagicMock()
 
-with patch('src.tglogging.get_logger', mock_get_logger):
+def mock_configparser(environ):
+    return MagicMock()
+
+with patch('src.tglogging.get_logger', mock_get_logger), patch('src.tglogging.configparser.SafeConfigParser', mock_configparser):
     # from src.dispatcher import tg_start_dispatcher
     import src.dispatcher
+# END OF MOCKING
 
 async def test_tg_start_dispatcher():
     # Create mock update and context objects
@@ -41,9 +35,6 @@ async def test_tg_start_dispatcher():
     context = MagicMock()
 
     # Replace the original bot and logger objects with mock objects
-
-    # global logger
-    # logger = MockLogger()
 
     # Call the tg_start_dispatcher function with the mock update and context objects
     await src.dispatcher.tg_start_dispatcher(update, context, [])
