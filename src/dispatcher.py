@@ -219,8 +219,10 @@ async def tg_prompt_dispatcher(update, context, command_args):
 
         answer = helper_get_answer_from_prompt(command_args)
         if answer is not None:
+            logger.info(f"tg_prompt_dispatcher answer {answer}")
             await bot.send_message(update.message.chat.id, answer, reply_to_message_id=update.message.message_id)
         else:
+            logger.info(f"tg_prompt_dispatcher answer \"Sorry, I can't answer that.\"")
             await bot.send_message(update.message.chat.id, "Sorry, I can't answer that.", reply_to_message_id=update.message.message_id)
 
         return
@@ -265,6 +267,7 @@ async def tg_summary_dispatcher(update, context, command_args):
                 #FIXME: we can get url_content_body = None even for valid url. So this else is not 100% correct
                 summary = helper_get_summary_from_text(url_or_text)
 
+            logger.info(f"tg_summary_dispatcher response: {summary}")
             await bot.send_message(update.message.chat.id, summary, reply_to_message_id=update.message.message_id)
 
     except Exception as e:
@@ -284,6 +287,7 @@ async def tg_start_dispatcher(update, context, command_args):
             "I'm still in development, so I'm not very smart yet. But I'm learning every day."
             "You can find my source code here: <a href=\"https://github.com/rvnikita/Personal_Assistant_AI_Bot\">https://github.com/rvnikita/Personal_Assistant_AI_Bot</a>")
 
+            logger.info(f"tg_start_dispatcher response: {welcome_message}")
             await bot.send_message(update.message.chat.id, welcome_message, parse_mode="HTML", disable_web_page_preview=True)
     except Exception as e:
         logger.error(f"Error in {__file__}: {e}")
