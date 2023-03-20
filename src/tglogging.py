@@ -37,6 +37,8 @@ def get_logger():
     handler = TelegramLoggerHandler()
     # formatter = logging.Formatter(config['LOGGING']['FORMAT'])
     # handler.setFormatter(formatter)
+    if (logger.hasHandlers()):
+        logger.handlers.clear()
     logger.addHandler(handler)
 
     return logger
