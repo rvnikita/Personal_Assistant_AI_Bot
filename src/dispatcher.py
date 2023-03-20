@@ -322,12 +322,22 @@ async def tg_dispatcher(update, context):
     except Exception as e:
         logger.error(f"Error in {__file__}: {e}")
 
+async def tg_error_handler(update, context):
+    try:
+        logger.error(f"tg_error_handler: {context.error}")
+        await bot.send_message(update.message.chat.id, f"Error: {context.error}")
+    except Exception as e:
+        logger.error(f"Error in {__file__}: {e}")
+
 def main() -> None:
     try:
         application = Application.builder().token(config['BOT']['KEY']).build()
 
         #for now only work with commands
         application.add_handler(MessageHandler(filters=filters.ALL & filters.COMMAND, callback=tg_dispatcher), group=0)
+
+        #error handler
+        application.add_error_handler(tg_error_handler)
 
         #TODO:LOW: add handler for replys to messages, so we can get questions from users on our summary and answer them
         #TODO:LOW: We can add default behaviour to show available commands if user sends a message that is not a command, but we should not send it in chats, otherwise we will be triggered everytime
