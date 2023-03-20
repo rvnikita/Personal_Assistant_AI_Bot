@@ -12,7 +12,6 @@ config_path = os.path.dirname(__file__) + '/../config/' #we need this trick to g
 config.read(config_path + 'settings.ini')
 
 logger = logging.get_logger()
-logger.info('Starting ' + __file__ + ' in ' + config['BOT']['MODE'] + ' mode at ' + str(os.uname()))
 
 class Base(DeclarativeBase):
     pass
