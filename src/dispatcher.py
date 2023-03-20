@@ -125,6 +125,7 @@ async def tg_dispatcher(update, context):
                     status = 'active',
                     last_message_datetime = datetime.datetime.now()
                 )
+                db_helper.session.add(user)
             else:
                 user.last_message_datetime = datetime.datetime.now()
             db_helper.session.commit()
