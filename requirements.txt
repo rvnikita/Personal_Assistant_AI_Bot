@@ -7,3 +7,4 @@ openai
 bs4
 pytest
 pytest-asyncio
+sqlalchemy

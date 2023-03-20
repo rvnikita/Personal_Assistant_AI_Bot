@@ -1,11 +1,13 @@
 import src.tglogging as logging
 import src.openai_helper as openai_helper
+import src.db_helper as db_helper
 
 import os
 import configparser
 from telegram import Bot
 from telegram.ext import Application, MessageHandler, filters, CommandHandler
 import re
+import datetime
 
 #TODO:HIGH: we need to move all this to a separate file
 config = configparser.SafeConfigParser(os.environ)
@@ -13,7 +15,6 @@ config_path = os.path.dirname(__file__) + '/../config/' #we need this trick to g
 config.read(config_path + 'settings.ini')
 
 logger = logging.get_logger()
-
 logger.info('Starting ' + __file__ + ' in ' + config['BOT']['MODE'] + ' mode at ' + str(os.uname()))
 
 bot = Bot(config['BOT']['KEY'])
@@ -113,6 +114,21 @@ async def tg_start_dispatcher(update, context, command_args):
 async def tg_dispatcher(update, context):
     try:
         if update.message is not None:
+
+            user = db_helper.session.query(db_helper.User).filter_by(id=update.message.chat.id).first()
+            if user is None:
+                user = db_helper.User(
+                    id = update.message.chat.id,
+                    username = update.message.chat.username,
+                    first_name = update.message.chat.first_name,
+                    last_name = update.message.chat.last_name,
+                    status = 'active',
+                    last_message_datetime = datetime.datetime.now()
+                )
+            else:
+                user.last_message_datetime = datetime.datetime.now()
+            db_helper.session.commit()
+
             #TODO:MED: this is not working if it is a chat, not a DM
             logger.info(f"tg_dispatcher request {update.message.chat.first_name} {update.message.chat.last_name} @{update.message.chat.username} ({update.message.chat.id}): {update.message.text}")
 
