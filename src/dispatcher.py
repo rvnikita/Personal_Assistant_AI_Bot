@@ -114,20 +114,15 @@ async def tg_start_dispatcher(update, context, command_args):
 async def tg_dispatcher(update, context):
     try:
         if update.message is not None:
-
-            user = db_helper.session.query(db_helper.User).filter_by(id=update.message.chat.id).first()
-            if user is None:
-                user = db_helper.User(
-                    id = update.message.chat.id,
-                    username = update.message.chat.username,
-                    first_name = update.message.chat.first_name,
-                    last_name = update.message.chat.last_name,
-                    status = 'active',
-                    last_message_datetime = datetime.datetime.now()
-                )
-                db_helper.session.add(user)
-            else:
-                user.last_message_datetime = datetime.datetime.now()
+            user = db_helper.User(
+                id=update.message.chat.id,
+                username=update.message.chat.username,
+                first_name=update.message.chat.first_name,
+                last_name=update.message.chat.last_name,
+                status='active',
+                last_message_datetime=datetime.datetime.now()
+            )
+            db_helper.session.merge(user)
             db_helper.session.commit()
 
             #TODO:MED: this is not working if it is a chat, not a DM
