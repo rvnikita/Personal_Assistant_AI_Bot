@@ -76,6 +76,8 @@ async def tg_summary_dispatcher(update, context, command_args):
                 return
 
             await bot.send_message(update.message.chat.id, "Generating summary... \n(can take 2-3 minutes for big pages)", reply_to_message_id=update.message.message_id)
+            await bot.send_chat_action(update.message.chat.id, 'typing', timeout=60)
+
             url_content_title, url_content_body = openai_helper.helper_get_url_content(url_or_text)
 
             #check if it's a url or a text
@@ -114,6 +116,8 @@ async def tg_start_dispatcher(update, context, command_args):
 async def tg_dispatcher(update, context):
     try:
         if update.message is not None:
+            await bot.send_chat_action(update.message.chat.id, 'typing', timeout=60)
+
             user = db_helper.User(
                 id=update.message.chat.id,
                 username=update.message.chat.username,
