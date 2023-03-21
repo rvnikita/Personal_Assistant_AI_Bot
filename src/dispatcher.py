@@ -99,8 +99,8 @@ async def tg_start_dispatcher(update, context, command_args):
             welcome_message = (f"Hi {update.message.chat.first_name} {update.message.chat.last_name}!\n"
             "I'm an AI Personal Aisstant.\n\n"
             "<b>List of supported commands:</b>\n"
-            "/summary or /s - get summary of a text or a webpage\n"
-            "/prompt or /p - get GPT prompt answe\n"
+            "/summary [TEXT or LINK] or /s - get summary of a text or a webpage\n"
+            "/prompt [TEXT] or /p - get GPT prompt answer\n"
             "/start - get welcome message with available commands\n\n"
             "I'm still in development, so I'm not very smart yet. But I'm learning every day."
             "You can find my source code here: <a href=\"https://github.com/rvnikita/Personal_Assistant_AI_Bot\">https://github.com/rvnikita/Personal_Assistant_AI_Bot</a>")
