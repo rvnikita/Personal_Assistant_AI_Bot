@@ -7,3 +7,7 @@
 
 # Ignore all pytest_cache directories
 **/.pytest_cache
+
+# Alembic - I think I don't want to store the migrations in the repo for now
+alembic.ini
+alembic/
