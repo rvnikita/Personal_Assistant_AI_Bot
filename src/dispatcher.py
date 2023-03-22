@@ -158,7 +158,8 @@ async def tg_dispatcher(update, context):
 async def tg_error_handler(update, context):
     try:
         logger.error(f"tg_error_handler: {context.error}")
-        await bot.send_message(update.message.chat.id, f"Error: {context.error}")
+        if update.message is not None:
+            await bot.send_message(update.message.chat.id, f"Error: {context.error}")
     except Exception as e:
         logger.error(f"Error in {__file__}: {e}")
 
