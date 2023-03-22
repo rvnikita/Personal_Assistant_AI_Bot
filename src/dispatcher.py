@@ -6,8 +6,10 @@ import os
 import configparser
 from telegram import Bot
 from telegram.ext import Application, MessageHandler, filters, CommandHandler
+from telegram.request import HTTPXRequest
 import re
 import datetime
+
 
 #TODO:HIGH: we need to move all this to a separate file
 config = configparser.SafeConfigParser(os.environ)
@@ -17,7 +19,9 @@ config.read(config_path + 'settings.ini')
 logger = logging.get_logger()
 logger.info('Starting ' + __file__ + ' in ' + config['BOT']['MODE'] + ' mode at ' + str(os.uname()))
 
-bot = Bot(config['BOT']['KEY'])
+bot = Bot(config['BOT']['KEY'],
+          request=HTTPXRequest(http_version="1.1"), #we need this to fix bug https://github.com/python-telegram-bot/python-telegram-bot/issues/3556
+          get_updates_request=HTTPXRequest(http_version="1.1")) #we need this to fix bug https://github.com/python-telegram-bot/python-telegram-bot/issues/3556
 
 
 async def tg_prompt_dispatcher(update, context, command_args):
