@@ -1,6 +1,6 @@
 import src.tglogging as logging
 
-from sqlalchemy import Column, String, DateTime, Integer, create_engine
+from sqlalchemy import Column, String, DateTime, BigInteger, Integer, create_engine
 from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.orm import Session
 import datetime
@@ -19,7 +19,7 @@ class Base(DeclarativeBase):
 class User(Base):
     __tablename__ = 'users'
 
-    id = Column(Integer, primary_key=True)
+    id = Column(BigInteger, primary_key=True)
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
     username = Column(String)
     first_name = Column(String)
