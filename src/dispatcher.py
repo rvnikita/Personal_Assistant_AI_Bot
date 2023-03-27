@@ -123,7 +123,7 @@ async def tg_dispatcher(update, context):
         if update.message is not None:
             await bot.send_chat_action(update.message.chat.id, 'typing')
 
-            user = db_helper.User.query.filter_by(id=update.message.chat.id).first()
+            user = db_helper.session.query(db_helper.User).filter_by(id=update.message.chat.id).first()
 
             if not user:
                 # If the user is not in the database, add them
