@@ -3,7 +3,7 @@
 .idea/
 
 # Ignore files related to API keys
-.venv
+/config/.env
 
 # Ignore all pytest_cache directories
 **/.pytest_cache
