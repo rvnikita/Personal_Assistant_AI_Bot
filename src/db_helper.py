@@ -26,6 +26,7 @@ class User(Base):
     last_name = Column(String)
     status = Column(String)
     last_message_datetime = Column(DateTime)
+    requests_counter = Column(Integer, default=0)
 
 #connect to postgresql
 engine = create_engine(f"postgresql://{config['DB']['USER']}:{config['DB']['PASSWORD']}@{config['DB']['HOST']}:{config['DB']['PORT']}/{config['DB']['NAME']}")

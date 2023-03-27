@@ -123,15 +123,24 @@ async def tg_dispatcher(update, context):
         if update.message is not None:
             await bot.send_chat_action(update.message.chat.id, 'typing')
 
-            user = db_helper.User(
-                id=update.message.chat.id,
-                username=update.message.chat.username,
-                first_name=update.message.chat.first_name,
-                last_name=update.message.chat.last_name,
-                status='active',
-                last_message_datetime=datetime.datetime.now()
-            )
-            db_helper.session.merge(user)
+            user = db_helper.User.query.filter_by(id=update.message.chat.id).first()
+
+            if not user:
+                # If the user is not in the database, add them
+                user = db_helper.User(
+                    id=update.message.chat.id,
+                    username=update.message.chat.username,
+                    first_name=update.message.chat.first_name,
+                    last_name=update.message.chat.last_name,
+                    status='active',
+                    last_message_datetime=datetime.datetime.now(),
+                    requests_counter=0
+                )
+                db_helper.session.add(user)
+
+            user.requests_counter += 1
+            user.last_message_datetime = datetime.datetime.now()
+
             db_helper.session.commit()
 
             #TODO:MED: this is not working if it is a chat, not a DM
