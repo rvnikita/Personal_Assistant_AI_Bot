@@ -137,6 +137,9 @@ async def tg_dispatcher(update, context):
                     requests_counter=0
                 )
                 db_helper.session.add(user)
+            else:
+                if user.requests_counter is None:
+                    user.requests_counter = 0
 
             user.requests_counter += 1
             user.last_message_datetime = datetime.datetime.now()
