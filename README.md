@@ -6,6 +6,8 @@ In addition to its summarization capabilities, GPTBot will also offers personali
 
 DEMO: http://t.me/Personal_Assistant_AI_Bot
 
+Author blog: http://t.me/rvnikita_blog
+
 # Installation
 1. Use environment variables to properly fill settings.ini parameters
 
