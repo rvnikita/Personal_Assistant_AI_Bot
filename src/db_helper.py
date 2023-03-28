@@ -1,6 +1,6 @@
 import src.tglogging as logging
 
-from sqlalchemy import Column, String, DateTime, BigInteger, Integer, create_engine
+from sqlalchemy import Column, String, DateTime, BigInteger, Integer, create_engine, Boolean
 from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.orm import Session
 import datetime
@@ -27,6 +27,7 @@ class User(Base):
     status = Column(String)
     last_message_datetime = Column(DateTime)
     requests_counter = Column(Integer, default=0)
+    blacklisted = Column(Boolean, default=0)
 
 #connect to postgresql
 engine = create_engine(f"postgresql://{config['DB']['USER']}:{config['DB']['PASSWORD']}@{config['DB']['HOST']}:{config['DB']['PORT']}/{config['DB']['NAME']}")

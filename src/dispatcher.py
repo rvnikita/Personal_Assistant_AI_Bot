@@ -121,8 +121,6 @@ async def tg_start_dispatcher(update, context, command_args):
 async def tg_dispatcher(update, context):
     try:
         if update.message is not None:
-            await bot.send_chat_action(update.message.chat.id, 'typing')
-
             user = db_helper.session.query(db_helper.User).filter_by(id=update.message.chat.id).first()
 
             if not user:
@@ -140,6 +138,11 @@ async def tg_dispatcher(update, context):
             else:
                 if user.requests_counter is None:
                     user.requests_counter = 0
+
+            if user.blacklisted is True:
+                return
+
+            await bot.send_chat_action(update.message.chat.id, 'typing')
 
             user.requests_counter += 1
             user.last_message_datetime = datetime.datetime.now()
