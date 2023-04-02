@@ -13,7 +13,7 @@ import datetime
 
 #TODO:HIGH: move env variables to .env file
 #TODO:HIGH: we need to move all this to a separate file
-config = configparser.SafeConfigParser(os.environ)
+config = configparser.ConfigParser(os.environ)
 config_path = os.path.dirname(__file__) + '/../config/' #we need this trick to get path to config folder
 config.read(config_path + 'settings.ini')
 
