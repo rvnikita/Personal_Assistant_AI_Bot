@@ -120,57 +120,58 @@ async def tg_start_dispatcher(update, context, command_args):
 #we will use this function to separate command and it's parameters and send to the proper function
 async def tg_dispatcher(update, context):
     try:
-        if update.message is not None:
-            user = db_helper.session.query(db_helper.User).filter_by(id=update.message.chat.id).first()
+        with db_helper.session_scope as session:
+            if update.message is not None:
+                user = session.query(db_helper.User).filter_by(id=update.message.chat.id).first()
 
-            if not user:
-                # If the user is not in the database, add them
-                user = db_helper.User(
-                    id=update.message.chat.id,
-                    username=update.message.chat.username,
-                    first_name=update.message.chat.first_name,
-                    last_name=update.message.chat.last_name,
-                    status='active',
-                    last_message_datetime=datetime.datetime.now(),
-                    requests_counter=0
-                )
-                db_helper.session.add(user)
-            else:
-                if user.requests_counter is None:
-                    user.requests_counter = 0
+                if not user:
+                    # If the user is not in the database, add them
+                    user = db_helper.User(
+                        id=update.message.chat.id,
+                        username=update.message.chat.username,
+                        first_name=update.message.chat.first_name,
+                        last_name=update.message.chat.last_name,
+                        status='active',
+                        last_message_datetime=datetime.datetime.now(),
+                        requests_counter=0
+                    )
+                    session.add(user)
+                else:
+                    if user.requests_counter is None:
+                        user.requests_counter = 0
 
-            if user.blacklisted is True:
-                return
+                if user.blacklisted is True:
+                    return
 
-            await bot.send_chat_action(update.message.chat.id, 'typing')
+                await bot.send_chat_action(update.message.chat.id, 'typing')
 
-            user.requests_counter += 1
-            user.last_message_datetime = datetime.datetime.now()
+                user.requests_counter += 1
+                user.last_message_datetime = datetime.datetime.now()
 
-            db_helper.session.commit()
+                session.commit()
 
-            #TODO:MED: this is not working if it is a chat, not a DM
-            logger.info(f"tg_dispatcher request {update.message.chat.first_name} {update.message.chat.last_name} @{update.message.chat.username} ({update.message.chat.id}): {update.message.text}")
+                #TODO:MED: this is not working if it is a chat, not a DM
+                logger.info(f"tg_dispatcher request {update.message.chat.first_name} {update.message.chat.last_name} @{update.message.chat.username} ({update.message.chat.id}): {update.message.text}")
 
-            command = None
-            match = re.match(r"^\/(\w+)\s*([\s\S]*)$", update.message.text, re.DOTALL)
-            if match:
-                command = match.group(1)
-                command_args = match.group(2)
-            else:
-                #await bot.send_message(update.message.chat.id, f"Unknown command")
-                #doing nothing
-                return
+                command = None
+                match = re.match(r"^\/(\w+)\s*([\s\S]*)$", update.message.text, re.DOTALL)
+                if match:
+                    command = match.group(1)
+                    command_args = match.group(2)
+                else:
+                    #await bot.send_message(update.message.chat.id, f"Unknown command")
+                    #doing nothing
+                    return
 
-            if command == "summary" or command == "s":
-                await tg_summary_dispatcher(update, context, command_args)
-            elif command == "start":
-                await tg_start_dispatcher(update, context, command_args)
-            elif command == "prompt" or command == "p":
-                await tg_prompt_dispatcher(update, context, command_args)
-            # Add more command handlers here as elif statements
-            else:
-                await bot.send_message(update.message.chat.id, f"Unknown command: {command}")
+                if command == "summary" or command == "s":
+                    await tg_summary_dispatcher(update, context, command_args)
+                elif command == "start":
+                    await tg_start_dispatcher(update, context, command_args)
+                elif command == "prompt" or command == "p":
+                    await tg_prompt_dispatcher(update, context, command_args)
+                # Add more command handlers here as elif statements
+                else:
+                    await bot.send_message(update.message.chat.id, f"Unknown command: {command}")
 
     except Exception as e:
         logger.error(f"Error in {__file__}: {e}")

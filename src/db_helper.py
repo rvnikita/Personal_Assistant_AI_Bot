@@ -3,6 +3,7 @@ import src.tglogging as logging
 from sqlalchemy import Column, String, DateTime, BigInteger, Integer, create_engine, Boolean
 from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.orm import Session
+from contextlib import contextmanager
 import datetime
 import os
 import configparser
@@ -30,6 +31,21 @@ class User(Base):
     blacklisted = Column(Boolean, default=0)
 
 #connect to postgresql
-engine = create_engine(f"postgresql://{config['DB']['USER']}:{config['DB']['PASSWORD']}@{config['DB']['HOST']}:{config['DB']['PORT']}/{config['DB']['NAME']}")
+# engine = create_engine(f"postgresql://{config['DB']['USER']}:{config['DB']['PASSWORD']}@{config['DB']['HOST']}:{config['DB']['PORT']}/{config['DB']['NAME']}")
+# session = Session(engine)
 
-session = Session(engine)
+session = None
+
+@contextmanager
+def session_scope(self):
+    self.db_engine = create_engine(f"postgresql://{config['DB']['USER']}:{config['DB']['PASSWORD']}@{config['DB']['HOST']}:{config['DB']['PORT']}/{config['DB']['NAME']}")
+    session = Session(self.db_engine)
+
+    try:
+        yield session
+        session.commit()
+    except:
+        session.rollback()
+        raise
+    finally:
+        session.close()
