@@ -3,10 +3,10 @@ import src.tglogging as logging
 from sqlalchemy import Column, String, DateTime, BigInteger, Integer, create_engine, Boolean
 from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.orm import Session
-from contextlib import contextmanager
 import datetime
 import os
 import configparser
+from contextlib import contextmanager
 
 config = configparser.ConfigParser(os.environ)
 config_path = os.path.dirname(__file__) + '/../config/' #we need this trick to get path to config folder
@@ -37,9 +37,9 @@ class User(Base):
 session = None
 
 @contextmanager
-def session_scope(self):
-    self.db_engine = create_engine(f"postgresql://{config['DB']['USER']}:{config['DB']['PASSWORD']}@{config['DB']['HOST']}:{config['DB']['PORT']}/{config['DB']['NAME']}")
-    session = Session(self.db_engine)
+def session_scope():
+    db_engine = create_engine(f"postgresql://{config['DB']['USER']}:{config['DB']['PASSWORD']}@{config['DB']['HOST']}:{config['DB']['PORT']}/{config['DB']['NAME']}")
+    session = Session(db_engine)
 
     try:
         yield session

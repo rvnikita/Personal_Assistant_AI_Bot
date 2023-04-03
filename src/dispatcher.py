@@ -120,7 +120,7 @@ async def tg_start_dispatcher(update, context, command_args):
 #we will use this function to separate command and it's parameters and send to the proper function
 async def tg_dispatcher(update, context):
     try:
-        with db_helper.session_scope as session:
+        with db_helper.session_scope() as session:
             if update.message is not None:
                 user = session.query(db_helper.User).filter_by(id=update.message.chat.id).first()
 
