@@ -104,13 +104,8 @@ async def tg_start_dispatcher(update, context, command_args):
             # TODO: think how could we compile this message automatically from the list of supported commands
             logger.info(f"tg_start_dispatcher request {update.message.chat.first_name} {update.message.chat.last_name} @{update.message.chat.username} ({update.message.chat.id}): {update.message.text}")
             welcome_message = (f"Hi {update.message.chat.first_name} {update.message.chat.last_name}!\n"
-            "I'm an AI Personal Aisstant.\n\n"
-            "<b>List of supported commands:</b>\n"
-            "/summary [TEXT or LINK] or /s - get summary of a text or a webpage\n"
-            "/prompt [TEXT] or /p - get GPT prompt answer\n"
-            "/start - get welcome message with available commands\n\n"
-            "I'm still in development, so I'm not very smart yet. But I'm learning every day."
-            "You can find my source code here: <a href=\"https://github.com/rvnikita/Personal_Assistant_AI_Bot\">https://github.com/rvnikita/Personal_Assistant_AI_Bot</a>")
+            "Привет, боте переехал по адресу @rvnikita_public\n\n"
+            "Адрес блога автора этого бота @rvnikita_blog")
 
             logger.info(f"tg_start_dispatcher response: {welcome_message}")
             await bot.send_message(update.message.chat.id, welcome_message, parse_mode="HTML", disable_web_page_preview=True)
