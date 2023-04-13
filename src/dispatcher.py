@@ -104,7 +104,8 @@ async def tg_start_dispatcher(update, context, command_args):
             # TODO: think how could we compile this message automatically from the list of supported commands
             logger.info(f"tg_start_dispatcher request {update.message.chat.first_name} {update.message.chat.last_name} @{update.message.chat.username} ({update.message.chat.id}): {update.message.text}")
             welcome_message = (f"Hi {update.message.chat.first_name} {update.message.chat.last_name}!\n"
-            "Привет, боте переехал по адресу @rvnikita_public\n\n"
+           "Bot has moved to @rvnikita_public\n\n"
+            "Бот переехал по адресу @rvnikita_public\n\n"
             "Адрес блога автора этого бота @rvnikita_blog")
 
             logger.info(f"tg_start_dispatcher response: {welcome_message}")
@@ -115,6 +116,20 @@ async def tg_start_dispatcher(update, context, command_args):
 #we will use this function to separate command and it's parameters and send to the proper function
 async def tg_dispatcher(update, context):
     try:
+        if update.message is not None:
+            #We are not going to support this bot anymore so redirecting to the new bot
+            logger.info(f"tg_start_dispatcher request {update.message.chat.first_name} {update.message.chat.last_name} @{update.message.chat.username} ({update.message.chat.id}): {update.message.text}")
+            welcome_message = (f"Hi {update.message.chat.first_name} {update.message.chat.last_name}!\n"
+           "Bot has moved to @rvnikita_public\n\n"
+            "Бот переехал по адресу @rvnikita_public\n\n"
+            "Адрес блога автора этого бота @rvnikita_blog")
+
+            logger.info(f"tg_start_dispatcher response: {welcome_message}")
+            await bot.send_message(update.message.chat.id, welcome_message, parse_mode="HTML", disable_web_page_preview=True)
+            return
+
+
+
         with db_helper.session_scope() as session:
             if update.message is not None:
                 user = session.query(db_helper.User).filter_by(id=update.message.chat.id).first()
